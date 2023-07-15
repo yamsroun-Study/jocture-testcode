@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/testcode
+    username: postgres
+    password: abcd1234
+  sql:
+    init:
+      mode: always
+
+logging:
+  level:
+    jocture.testcode: debug
