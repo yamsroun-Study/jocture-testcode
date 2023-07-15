@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="jocture.testcode.repository.MemberMapper">
+    <insert id="save" parameterType="jocture.testcode.domain.Member" useGeneratedKeys="true" keyProperty="id">
+        insert into testcode.member (name, email)
+        values (#{name}, #{email})
+    </insert>
+
+    <select id="findById" parameterType="int" resultType="jocture.testcode.domain.Member">
+        select *
+        from testcode.member
+        where id = #{id}
+    </select>
+
+    <select id="findByEmail" parameterType="String" resultType="jocture.testcode.domain.Member">
+        select *
+        from testcode.member
+        where email = #{email}
+    </select>
+</mapper>
