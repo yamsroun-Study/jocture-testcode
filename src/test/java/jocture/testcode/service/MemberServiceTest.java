@@ -7,34 +7,29 @@ import jocture.testcode.repository.MemberRepository;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.*;
 
-@SpringBootTest
-@Transactional
-class MemberServiceSpringBootTest {
+@ExtendWith(MockitoExtension.class)
+class MemberServiceTest {
 
-    @Autowired
+    @InjectMocks
     MemberService memberService;
 
-    @Autowired
+    @Mock
     MemberRepository memberRepository;
 
-    //TC-Test Case
-    //@Disabled
     @Test
-    //@RepeatedTest(10)
-    //@Commit
-    //@Rollback
     @DisplayName("회원 가입 - 정상")
     void join() {
-        //BDD 스타일 - Given/When/Then
         //given
         Member member = new Member("jjlim", "jjlim@ab.com");
 
@@ -42,13 +37,9 @@ class MemberServiceSpringBootTest {
         memberService.join(member);
 
         //then
-        assertThat(member.getId()).isNotNull();
-        assertThat(member.getId()).isPositive();
-
-        Optional<Member> result = memberRepository.findById(member.getId());
-        assertThat(result).isPresent();
-        assertThat(result.get().getName()).isEqualTo(member.getName());
-        assertThat(result.get().getEmail()).isEqualTo(member.getEmail());
+        then(memberRepository).should().save(member);
+        //then(memberRepository).should(times(1)).save(member);
+        //then(memberRepository).should(atLeastOnce()).save(member);
     }
 
     @Test
@@ -56,25 +47,27 @@ class MemberServiceSpringBootTest {
     void join_duplicateEmail() {
         //given
         Member member1 = new Member("jjlim", "jjlim@ab.com");
-        memberRepository.save(member1);
-        Member member2 = new Member("jjlim22222", "jjlim@ab.com");
+        given(memberRepository.findByEmail(any())).willReturn(Optional.of(member1));
 
         //when
-        ThrowableAssert.ThrowingCallable callable = () -> memberService.join(member2);
+        Member member = new Member("jjlim", "jjlim@ab.com");
+        ThrowableAssert.ThrowingCallable callable = () -> memberService.join(member);
 
         //then
         assertThatThrownBy(callable).isInstanceOf(DuplicateEmailMemberException.class);
+        then(memberRepository).should(never()).save(member);
     }
 
     @Test
     @DisplayName("회원 조회 - 결과 있음")
     void getMember() {
         //given
-        Member member = new Member("jjlim", "jjlim@ab.com");
-        memberRepository.save(member);
+        Member member = new Member("jjlim", "jjlim@ac.com");
+        given(memberRepository.findById(anyInt())).willReturn(Optional.of(member));
 
         //when
-        Member result = memberService.getMember(member.getId());
+        int memberId = 1;
+        Member result = memberService.getMember(memberId);
 
         //then
         assertThat(result.getName()).isEqualTo(member.getName());
@@ -85,9 +78,10 @@ class MemberServiceSpringBootTest {
     @DisplayName("회원 조회 - 결과 없음")
     void getMember_noExists() {
         //given
-        int noExistsMemberId = -999;
+        given(memberRepository.findById(anyInt())).willReturn(Optional.empty());
 
         //when
+        int noExistsMemberId = -999;
         ThrowableAssert.ThrowingCallable callable = () -> memberService.getMember(noExistsMemberId);
 
         //then
