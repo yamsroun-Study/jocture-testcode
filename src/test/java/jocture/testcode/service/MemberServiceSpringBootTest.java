@@ -16,7 +16,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
+@SpringBootTest //스프링부트 테스트 or 통합테스트(API 테스트, End-to-End(E2E) 테스트)
 @Transactional
 class MemberServiceSpringBootTest {
 

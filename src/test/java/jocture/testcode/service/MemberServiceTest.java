@@ -18,6 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.*;
 
+//유닛테스트 -> 슬라이스 테스트, 모키토 테스트, TestNG
+//슬라이스 테스트 -> @WebMvcTest, @DataJpaTest, @JsonTest, @RestClientTest 등 애너테이션
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
 
